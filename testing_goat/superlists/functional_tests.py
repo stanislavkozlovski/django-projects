@@ -1,6 +1,6 @@
 import unittest
 from selenium import webdriver
-
+from selenium.webdriver.common.keys import Keys
 
 class NewVisitorTest(unittest.TestCase):
     def setUp(self):
@@ -15,17 +15,34 @@ class NewVisitorTest(unittest.TestCase):
         self.browser.get('http://localhost:1337')
         # It sees something about TODOs in the title
         self.assertIn('To-Do', self.browser.title)
-        self.fail('Finish the tests!')
+        header_text = self.browser.find_element_by_tag_name('h1').text
+        self.assertEqual(header_text, 'To-Do')
         # It is invited to enter a goat TODO
-
+        input_box = self.browser.find_element_by_id('new_item')
+        self.assertEqual(
+            input_box.get_attribute('placeholder'),
+            'Add a to-do'
+        )
         # It types "Test Coffee"
+        input_box.send_keys('Test Coffee')
 
         # When it presses enter, the page reloads and a textbox prompts for another TODO
+        input_box.send_keys(Keys.ENTER)
 
         # It types "Buy Coffee" and presses enter again
+        input_box = self.browser.find_element_by_id('new_item')
+        input_box.send_keys('Buy Coffee')
+        input_box.send_keys(Keys.ENTER)
 
         # His two TODOs are now saved and have a unique URL for the Testing Goat, which is described in the page
-
+        table = self.browser.find_element_by_id('list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertTrue(
+            any(row.text == '1: Test Coffee' for row in rows)
+        )
+        self.assertTrue(
+            any(row.text == '2: Buy Coffee' for row in rows)
+        )
         # It goes on to test some things, as testing goats do, and comes back, opening that URL.
 
         # He sees that all of his TODOs are still there
