@@ -28,6 +28,9 @@ class HomePageTests(TestCase):
         response = home_page(request)
 
         self.assertIn('Coffee', response.content.decode())
+        expected_html = render_to_string('home.html',
+                                         { 'new_item_text': 'Coffee'})
+        self.assertEqualExceptCSFR(response.content.decode(), expected_html)
 
     @staticmethod
     def remove_csrf(html_code):
