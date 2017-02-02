@@ -10,4 +10,4 @@ def home_page(request: HttpRequest):
         return redirect('/')
 
     return render(request, 'home.html',
-                  {'new_item_text': new_item_text})
+                  {'items': Item.objects.all()})

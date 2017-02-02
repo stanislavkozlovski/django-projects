@@ -25,12 +25,21 @@ class HomePageTests(TestCase):
         request = HttpRequest()
         request.method = 'POST'
         request.POST['item_text'] = 'Coffee'
-
-        response: HttpResponse = home_page(request)
+        home_page(request)
 
         self.assertEqual(Item.objects.count(), 1)
         first_obj = Item.objects.first()
         self.assertEqual(first_obj.text, 'Coffee')
+
+    def test_home_page_displays_multiple_items(self):
+        Item.objects.create(text="One")
+        Item.objects.create(text="Two")
+
+        request = HttpRequest()
+        response: HttpResponse = home_page(request)
+
+        self.assertIn('One', response.content.decode())
+        self.assertIn('Two', response.content.decode())
 
     def test_home_page_redirects_after_post(self):
         request = HttpRequest()
