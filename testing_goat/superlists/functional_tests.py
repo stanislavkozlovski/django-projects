@@ -2,6 +2,7 @@ import unittest
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
+
 class NewVisitorTest(unittest.TestCase):
     def setUp(self):
         self.browser = webdriver.Chrome()
@@ -38,10 +39,12 @@ class NewVisitorTest(unittest.TestCase):
         table = self.browser.find_element_by_id('list_table')
         rows = table.find_elements_by_tag_name('tr')
         self.assertTrue(
-            any(row.text == '1: Test Coffee' for row in rows)
+            any(row.text == '1: Test Coffee' for row in rows),
+            'First To-Do item did not appear'
         )
         self.assertTrue(
-            any(row.text == '2: Buy Coffee' for row in rows)
+            any(row.text == '2: Buy Coffee' for row in rows),
+            'Second To-Do item did not appear'
         )
         # It goes on to test some things, as testing goats do, and comes back, opening that URL.
 
