@@ -6,8 +6,9 @@
 </head>
 <body>
     <h1>To-Do</h1>
-    <form method="POST" action="/to_do/add">
-        <input id="new_item" placeholder="Add a to-do" />
+    <form method="POST">
+        <input id="new_item" name="item_text" placeholder="Add a to-do" />
+        {% csrf_token %}
     </form>
 
     <table id="list_table">
