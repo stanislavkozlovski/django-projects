@@ -8,6 +8,11 @@ class NewVisitorTest(unittest.TestCase):
         self.browser = webdriver.Chrome()
         self.browser.implicitly_wait(3)
 
+    def assertRowInTable(self, desired_row):
+        table = self.browser.find_element_by_id('list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn(desired_row, [row.text for row in rows])
+
     def tearDown(self):
         self.browser.quit()
 
@@ -36,10 +41,10 @@ class NewVisitorTest(unittest.TestCase):
         input_box.send_keys(Keys.ENTER)
 
         # His two TODOs are now saved and have a unique URL for the Testing Goat, which is described in the page
-        table = self.browser.find_element_by_id('list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn('1: Test Coffee', [row.text for row in rows])
-        self.assertIn('2: Buy Coffee', [row.text for row in rows])
+        self.assertRowInTable('1: Test Coffee')
+        self.assertRowInTable('2: Buy Coffee')
+        # self.assertIn(, [row.text for row in rows])
+        # self.assertIn('2: Buy Coffee', [row.text for row in rows])
 
         # It goes on to test some things, as testing goats do, and comes back, opening that URL.
 
