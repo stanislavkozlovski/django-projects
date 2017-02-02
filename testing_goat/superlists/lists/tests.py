@@ -3,7 +3,7 @@ import re
 from django.core.urlresolvers import resolve
 from django.template.loader import render_to_string
 from django.test import TestCase
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from lists.views import home_page
 from lists.models import Item
 
@@ -21,17 +21,29 @@ class HomePageTests(TestCase):
         expected_html = render_to_string('home.html', request=request)
         self.assertEqualExceptCSFR(response.content.decode(), expected_html)
 
-    def test_post_request_home_page(self):
+    def test_home_page_post_request_saves_item(self):
         request = HttpRequest()
         request.method = 'POST'
         request.POST['item_text'] = 'Coffee'
 
-        response = home_page(request)
+        response: HttpResponse = home_page(request)
 
-        self.assertIn('Coffee', response.content.decode())
-        expected_html = render_to_string('home.html',
-                                         { 'new_item_text': 'Coffee'})
-        self.assertEqualExceptCSFR(response.content.decode(), expected_html)
+        self.assertEqual(Item.objects.count(), 1)
+        first_obj = Item.objects.first()
+        self.assertEqual(first_obj.text, 'Coffee')
+
+    def test_home_page_redirects_after_post(self):
+        request = HttpRequest()
+        request.method = 'POST'
+        response: HttpResponse = home_page(request)
+
+        self.assertEqual(response.status_code, 302)  # redirected
+        self.assertEqual(response['location'], '/')
+
+    def test_item_is_saved_only_when_necessary(self):
+        request = HttpRequest()
+        home_page(request)
+        self.assertEqual(Item.objects.count(), 0)
 
     @staticmethod
     def remove_csrf(html_code):
