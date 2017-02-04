@@ -8,6 +8,19 @@ from lists.views import home_page, view_list
 from lists.models import Item
 
 
+class NewListTests(TestCase):
+    def test_new_list_page_post_request_saves_item(self):
+        self.client.post('/lists/new', data={'item_text': 'Coffee'})
+
+        self.assertEqual(Item.objects.count(), 1)
+        first_obj = Item.objects.first()
+        self.assertEqual(first_obj.text, 'Coffee')
+
+    def test_new_list_page_redirects_after_post(self):
+        response = self.client.post('/lists/new', data={'item_text': 'Aa'})
+        self.assertRedirects(response, '/lists/the-only-list-in-the-world', target_status_code=301)
+
+
 class ListViewTests(TestCase):
     def test_uses_lists_template(self):
         response = self.client.get('/lists/the-only-list-in-the-world/')
@@ -39,29 +52,6 @@ class HomePageTests(TestCase):
 
         expected_html = render_to_string('home.html', request=request)
         self.assertEqualExceptCSFR(response.content.decode(), expected_html)
-
-    def test_home_page_post_request_saves_item(self):
-        request = HttpRequest()
-        request.method = 'POST'
-        request.POST['item_text'] = 'Coffee'
-        home_page(request)
-
-        self.assertEqual(Item.objects.count(), 1)
-        first_obj = Item.objects.first()
-        self.assertEqual(first_obj.text, 'Coffee')
-
-    def test_home_page_redirects_after_post(self):
-        request = HttpRequest()
-        request.method = 'POST'
-        response: HttpResponse = home_page(request)
-
-        self.assertEqual(response.status_code, 302)  # redirected
-        self.assertEqual(response['location'], '/lists/the-only-list-in-the-world')
-
-    def test_item_is_saved_only_when_necessary(self):
-        request = HttpRequest()
-        home_page(request)
-        self.assertEqual(Item.objects.count(), 0)
 
     @staticmethod
     def remove_csrf(html_code):
