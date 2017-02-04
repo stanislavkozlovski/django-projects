@@ -14,6 +14,11 @@ class NewVisitorTest(LiveServerTestCase):
         rows = table.find_elements_by_tag_name('tr')
         self.assertIn(desired_row, [row.text for row in rows])
 
+    def assertRowNotInTable(self, desired_row):
+        table = self.browser.find_element_by_id('list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn(desired_row, [row.text for row in rows])
+
     def tearDown(self):
         self.browser.quit()
 
@@ -35,18 +40,37 @@ class NewVisitorTest(LiveServerTestCase):
 
         # When it presses enter, the page reloads and a textbox prompts for another TODO
         input_box.send_keys(Keys.ENTER)
-
+        # Gets redirected to a unique URL holding it's list
+        goat_list_url = self.browser.current_url
+        self.assertRegex(goat_list_url, r'/lists/.*')
+        self.assertRowInTable('1: Test Coffee')
         # It types "Buy Coffee" and presses enter again
         input_box = self.browser.find_element_by_id('new_item')
         input_box.send_keys('Buy Coffee')
         input_box.send_keys(Keys.ENTER)
 
         # His two TODOs are now saved and have a unique URL for the Testing Goat, which is described in the page
-        self.assertRowInTable('1: Test Coffee')
         self.assertRowInTable('2: Buy Coffee')
         # self.assertIn(, [row.text for row in rows])
         # self.assertIn('2: Buy Coffee', [row.text for row in rows])
 
-        # It goes on to test some things, as testing goats do, and comes back, opening that URL.
+        # It goes on to test some things
+        """ Another Testing Goat comes up and opens the site, he does not see the other one's items """
+        self.browser.quit()
+        self.browser = webdriver.Chrome()
+        self.browser.get(self.live_server_url)
+        self.assertRowNotInTable('1: Test Coffee')
+        self.assertRowNotInTable('2: Buy Coffee')
 
-        # He sees that all of his TODOs are still there
+        # the other goat adds a todo item, he is apparently more practical
+        input_box = self.browser.find_element_by_id('new_item')
+        input_box.send_keys('Test things')
+        input_box.send_keys(Keys.ENTER)
+        # Gets redirected to his own URL
+        other_goat_list_url = self.browser.current_url
+        self.assertRegex(goat_list_url, r'/lists/.*')
+        self.assertNotEqual(goat_list_url, other_goat_list_url)
+        self.assertRowNotInTable('1: Test Coffee')
+        self.assertRowNotInTable('2: Buy Coffee')
+        self.assertRowInTable('1: Test things')
+
