@@ -17,7 +17,7 @@ class NewVisitorTest(LiveServerTestCase):
     def assertRowNotInTable(self, desired_row):
         table = self.browser.find_element_by_id('list_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertIn(desired_row, [row.text for row in rows])
+        self.assertNotIn(desired_row, [row.text for row in rows])
 
     def tearDown(self):
         self.browser.quit()
