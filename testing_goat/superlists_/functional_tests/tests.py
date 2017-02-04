@@ -1,9 +1,10 @@
 import unittest
+from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
 
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
     def setUp(self):
         self.browser = webdriver.Chrome()
         self.browser.implicitly_wait(3)
@@ -18,7 +19,7 @@ class NewVisitorTest(unittest.TestCase):
 
     def test_can_start_todos_and_retrieve_them_later(self):
         # The Testing Goat opens up a popular todo-list website
-        self.browser.get('http://localhost:1337')
+        self.browser.get(self.live_server_url)
         # It sees something about TODOs in the title
         self.assertIn('To-Do', self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
@@ -49,7 +50,3 @@ class NewVisitorTest(unittest.TestCase):
         # It goes on to test some things, as testing goats do, and comes back, opening that URL.
 
         # He sees that all of his TODOs are still there
-
-
-if __name__ == '__main__':
-    unittest.main()
