@@ -4,11 +4,30 @@ from django.core.urlresolvers import resolve
 from django.template.loader import render_to_string
 from django.test import TestCase
 from django.http import HttpRequest, HttpResponse
-from lists.views import home_page
+from lists.views import home_page, view_list
 from lists.models import Item
 
 
+class ListViewTests(TestCase):
+    def test_uses_lists_template(self):
+        response = self.client.get('/lists/the-only-list-in-the-world/')
+        self.assertTemplateUsed(response, 'list.html')
+
+    def test_home_page_displays_multiple_items(self):
+        Item.objects.create(text="One")
+        Item.objects.create(text="Two")
+
+        response = self.client.get('/lists/the-only-list-in-the-world/')
+
+        self.assertContains(response, 'One')
+        self.assertContains(response, 'Two')
+
+
 class HomePageTests(TestCase):
+    def test_uses_home_template(self):
+        response = self.client.get('/')
+        self.assertTemplateUsed(response, 'home.html')
+
     def test_root_url_uses_home_page_view(self):
         result = resolve('/')
         # Should be tied to the same function
@@ -31,23 +50,13 @@ class HomePageTests(TestCase):
         first_obj = Item.objects.first()
         self.assertEqual(first_obj.text, 'Coffee')
 
-    def test_home_page_displays_multiple_items(self):
-        Item.objects.create(text="One")
-        Item.objects.create(text="Two")
-
-        request = HttpRequest()
-        response: HttpResponse = home_page(request)
-
-        self.assertIn('One', response.content.decode())
-        self.assertIn('Two', response.content.decode())
-
     def test_home_page_redirects_after_post(self):
         request = HttpRequest()
         request.method = 'POST'
         response: HttpResponse = home_page(request)
 
         self.assertEqual(response.status_code, 302)  # redirected
-        self.assertEqual(response['location'], '/')
+        self.assertEqual(response['location'], '/lists/the-only-list-in-the-world')
 
     def test_item_is_saved_only_when_necessary(self):
         request = HttpRequest()

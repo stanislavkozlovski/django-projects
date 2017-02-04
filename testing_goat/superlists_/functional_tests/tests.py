@@ -28,7 +28,7 @@ class NewVisitorTest(LiveServerTestCase):
         # It sees something about TODOs in the title
         self.assertIn('To-Do', self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
-        self.assertEqual(header_text, 'To-Do')
+        self.assertEqual(header_text, 'Start a new To-Do list')
         # It is invited to enter a goat TODO
         input_box = self.browser.find_element_by_id('new_item')
         self.assertEqual(
@@ -59,8 +59,6 @@ class NewVisitorTest(LiveServerTestCase):
         self.browser.quit()
         self.browser = webdriver.Chrome()
         self.browser.get(self.live_server_url)
-        self.assertRowNotInTable('1: Test Coffee')
-        self.assertRowNotInTable('2: Buy Coffee')
 
         # the other goat adds a todo item, he is apparently more practical
         input_box = self.browser.find_element_by_id('new_item')
