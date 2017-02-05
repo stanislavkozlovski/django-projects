@@ -1,3 +1,4 @@
+import sys
 import unittest
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
@@ -5,6 +6,22 @@ from selenium.webdriver.common.keys import Keys
 
 
 class NewVisitorTest(StaticLiveServerTestCase):
+    @classmethod
+    def setUpClass(cls):
+        # Use our own server for tests on staging/production
+        for arg in sys.argv:
+            if 'liveserver' in arg:
+                cls.server_url = 'http://' + arg.split('=')[1]
+                return
+
+        super().setUpClass()
+        cls.server_url = cls.live_server_url
+
+    @classmethod
+    def tearDownClass(cls):
+        if cls.server_url == cls.live_server_url:
+            super().tearDownClass()
+
     def setUp(self):
         self.browser = webdriver.Chrome()
         self.browser.implicitly_wait(3)
@@ -24,7 +41,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
 
     def test_can_start_todos_and_retrieve_them_later(self):
         # The Testing Goat opens up a popular todo-list website
-        self.browser.get(self.live_server_url)
+        self.browser.get(self.server_url)
         # It sees something about TODOs in the title
         self.assertIn('To-Do', self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
@@ -58,7 +75,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         """ Another Testing Goat comes up and opens the site, he does not see the other one's items """
         self.browser.quit()
         self.browser = webdriver.Chrome()
-        self.browser.get(self.live_server_url)
+        self.browser.get(self.server_url)
 
         # the other goat adds a todo item, he is apparently more practical
         input_box = self.browser.find_element_by_id('new_item')
@@ -74,7 +91,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
 
     def test_layout_and_styling(self):
         # The Aesthetic Goat visits our page
-        self.browser.get(self.live_server_url)
+        self.browser.get(self.server_url)
         self.browser.set_window_size(1024, 768)
         # It notices that the input box is nicely centered
         input_box = self.browser.find_element_by_id('new_item')
