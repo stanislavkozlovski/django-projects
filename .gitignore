@@ -9,6 +9,7 @@ __pycache__/
 /.idea
 testing_goat/*/.idea
 testing_goat/.idea
+testing_goat/static
 
 # Distribution / packaging
 .Python
