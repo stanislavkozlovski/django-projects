@@ -25,14 +25,14 @@ class ListCreationTests(FunctionalTest):
         # Gets redirected to a unique URL holding it's list
         goat_list_url = self.browser.current_url
         self.assertRegex(goat_list_url, r'/lists/.*')
-        self.assertRowInTable('1: Test Coffee')
+        self.assertRowInListTable('1: Test Coffee')
         # It types "Buy Coffee" and presses enter again
         input_box = self.browser.find_element_by_id('new_item')
         input_box.send_keys('Buy Coffee')
         input_box.send_keys(Keys.ENTER)
 
         # His two TODOs are now saved and have a unique URL for the Testing Goat, which is described in the page
-        self.assertRowInTable('2: Buy Coffee')
+        self.assertRowInListTable('2: Buy Coffee')
         # self.assertIn(, [row.text for row in rows])
         # self.assertIn('2: Buy Coffee', [row.text for row in rows])
 
@@ -50,8 +50,8 @@ class ListCreationTests(FunctionalTest):
         other_goat_list_url = self.browser.current_url
         self.assertRegex(goat_list_url, r'/lists/.*')
         self.assertNotEqual(goat_list_url, other_goat_list_url)
-        self.assertRowNotInTable('1: Test Coffee')
-        self.assertRowNotInTable('2: Buy Coffee')
-        self.assertRowInTable('1: Test things')
+        self.assertRowNotInListTable('1: Test Coffee')
+        self.assertRowNotInListTable('2: Buy Coffee')
+        self.assertRowInListTable('1: Test things')
 
 

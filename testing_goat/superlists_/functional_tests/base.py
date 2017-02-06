@@ -24,12 +24,12 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.browser = webdriver.Chrome()
         self.browser.implicitly_wait(3)
 
-    def assertRowInTable(self, desired_row):
+    def assertRowInListTable(self, desired_row):
         table = self.browser.find_element_by_id('list_table')
         rows = table.find_elements_by_tag_name('tr')
         self.assertIn(desired_row, [row.text for row in rows])
 
-    def assertRowNotInTable(self, desired_row):
+    def assertRowNotInListTable(self, desired_row):
         table = self.browser.find_element_by_id('list_table')
         rows = table.find_elements_by_tag_name('tr')
         self.assertNotIn(desired_row, [row.text for row in rows])
