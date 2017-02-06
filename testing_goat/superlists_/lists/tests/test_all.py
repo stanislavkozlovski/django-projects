@@ -20,7 +20,7 @@ class NewListTests(TestCase):
     def test_new_list_page_redirects_after_post(self):
         response = self.client.post('/lists/new', data={'item_text': 'Aa'})
         new_list = List.objects.first()
-        self.assertRedirects(response, f'/lists/{new_list.id}', target_status_code=301)
+        self.assertRedirects(response, f'/lists/{new_list.id}/')
 
     def test_validation_error_are_sent_back_to_home_page(self):
         response = self.client.post('/lists/new', data={'item_text': ''})
@@ -83,7 +83,7 @@ class ListViewTests(TestCase):
             data={'item_text': 'Hello'}
         )
 
-        self.assertRedirects(response, f'/lists/{lst.id}', target_status_code=301)
+        self.assertRedirects(response, f'/lists/{lst.id}/')
 
     def test_invalid_item_POST_shows_error(self):
         lst = List.objects.create()
