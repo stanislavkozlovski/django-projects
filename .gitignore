@@ -10,6 +10,7 @@ __pycache__/
 testing_goat/*/.idea
 testing_goat/.idea
 testing_goat/static
+testing_goat/virtualenv
 
 # Distribution / packaging
 .Python
