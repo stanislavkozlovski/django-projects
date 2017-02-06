@@ -11,6 +11,7 @@ def home_page(request: HttpRequest):
 
 # @lists/{list_id}
 def view_list(request: HttpRequest, list_id: str):
+    error_msg = None
     if request.method == 'POST':
         """ Creates and adds a new item to an existing TODO list """
         new_item_text = request.POST['item_text']
@@ -20,13 +21,14 @@ def view_list(request: HttpRequest, list_id: str):
         try:
             item.full_clean()
             item.save()
+
+            return redirect(f'/lists/{list_.id}')
         except ValidationError as e:
             item.delete()
-            return render(request, 'list.html', {'list': list_, 'error': "You can't have an empty list item!"})
+            error_msg = "You can't have an empty list item!"
 
-        return redirect(f'/lists/{list_.id}')
     list_: List = List.objects.get(id=list_id)
-    return render(request, 'list.html', {'list': list_})
+    return render(request, 'list.html', {'list': list_, 'error': error_msg})
 
 
 # @lists/new

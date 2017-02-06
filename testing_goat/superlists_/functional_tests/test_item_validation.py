@@ -34,3 +34,4 @@ class ItemValidationTests(FunctionalTest):
         self.browser.find_element_by_id('new_item').send_keys('Stop it!\n')
         self.assertRowInListTable('1: Stop being so clumsy!')
         self.assertRowInListTable('2: Stop it!')
+

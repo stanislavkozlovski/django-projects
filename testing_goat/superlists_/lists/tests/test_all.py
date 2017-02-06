@@ -85,6 +85,16 @@ class ListViewTests(TestCase):
 
         self.assertRedirects(response, f'/lists/{lst.id}', target_status_code=301)
 
+    def test_invalid_item_POST_shows_error(self):
+        lst = List.objects.create()
+
+        response = self.client.post(
+            f'/lists/{lst.id}/',
+            data={'item_text': ''}
+        )
+
+        self.assertContains(response, escape("You can't have an empty list item!"))
+
 
 class HomePageTests(TestCase):
     def test_uses_home_template(self):
