@@ -36,32 +36,6 @@ class NewListTests(TestCase):
         self.assertEqual(Item.objects.count(), 0)
 
 
-class NewItemTests(TestCase):
-    def test_can_save_a_POST_request_to_an_existing_list(self):
-        other_list = List.objects.create()
-        correct_list = List.objects.create()
-
-        self.client.post(
-            f'/lists/{correct_list.id}/add_item',
-            data={'item_text': 'Hello'}
-        )
-
-        self.assertEqual(Item.objects.count(), 1)
-        new_item = Item.objects.first()
-        self.assertEqual(new_item.text, 'Hello')
-        self.assertEqual(new_item.list, correct_list)
-
-    def test_POST_redirects_to_list_view(self):
-        lst = List.objects.create()
-
-        response = self.client.post(
-            f'/lists/{lst.id}/add_item',
-            data={'item_text': 'Hello'}
-        )
-
-        self.assertRedirects(response, f'/lists/{lst.id}', target_status_code=301)
-
-
 class ListViewTests(TestCase):
     def test_passes_correct_list_to_template(self):
         other_list = List.objects.create()
@@ -86,6 +60,30 @@ class ListViewTests(TestCase):
         self.assertContains(response, 'One')
         self.assertContains(response, 'Two')
         self.assertNotContains(response, 'Three')
+
+    def test_can_save_a_POST_request_to_an_existing_list(self):
+        other_list = List.objects.create()
+        correct_list = List.objects.create()
+
+        self.client.post(
+            f'/lists/{correct_list.id}/',
+            data={'item_text': 'Hello'}
+        )
+
+        self.assertEqual(Item.objects.count(), 1)
+        new_item = Item.objects.first()
+        self.assertEqual(new_item.text, 'Hello')
+        self.assertEqual(new_item.list, correct_list)
+
+    def test_POST_redirects_to_list_view(self):
+        lst = List.objects.create()
+
+        response = self.client.post(
+            f'/lists/{lst.id}/',
+            data={'item_text': 'Hello'}
+        )
+
+        self.assertRedirects(response, f'/lists/{lst.id}', target_status_code=301)
 
 
 class HomePageTests(TestCase):
