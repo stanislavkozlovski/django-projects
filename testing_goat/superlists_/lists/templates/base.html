@@ -15,10 +15,11 @@
                 <h1>{% block header_text %}{% endblock %}</h1>
 
                 <form method="POST" action="{% block form_action %}{% endblock %}">
-                    <input id="new_item"
-                           name="item_text" placeholder="Add a to-do"
-                           class="form-control input-lg"
-                    />
+                    {{ form.text }}
+{#                    <input id="new_item"#}
+{#                           name="item_text" placeholder="Add a to-do"#}
+{#                           class="form-control input-lg"#}
+{#                    />#}
                     {% csrf_token %}
 
                     {% if error %}

@@ -7,6 +7,7 @@ from django.http import HttpRequest, HttpResponse
 from django.utils.html import escape
 from lists.views import home_page, view_list
 from lists.models import Item, List
+from lists.forms import ItemForm
 
 
 class NewListTests(TestCase):
@@ -97,21 +98,13 @@ class ListViewTests(TestCase):
 
 
 class HomePageTests(TestCase):
-    def test_uses_home_template(self):
+    def test_home_page_renders_home_template(self):
         response = self.client.get('/')
         self.assertTemplateUsed(response, 'home.html')
 
-    def test_root_url_uses_home_page_view(self):
-        result = resolve('/')
-        # Should be tied to the same function
-        self.assertEqual(result.func, home_page)
-
-    def test_response_page_returns_correct_html(self):
-        request = HttpRequest()
-        response = home_page(request)
-
-        expected_html = render_to_string('home.html', request=request)
-        self.assertEqualExceptCSFR(response.content.decode(), expected_html)
+    def test_home_page_uses_item_form(self):
+        response = self.client.get('/')
+        self.assertIsInstance(response.context['form'], ItemForm)
 
     @staticmethod
     def remove_csrf(html_code):
@@ -119,7 +112,7 @@ class HomePageTests(TestCase):
         return re.sub(csrf_regex, '', html_code)
 
     def assertEqualExceptCSFR(self, html_code1, html_code2):
-        return self.assertEqual(
+        return self.assertMultiLineEqual(
             self.remove_csrf(html_code1),
             self.remove_csrf(html_code2)
         )
