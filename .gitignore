@@ -13,7 +13,7 @@ testing_goat/static
 testing_goat/virtualenv
 **/.idea/
 **/virtualenv/
-**/static/
+# **/static/
 
 # Distribution / packaging
 .Python
