@@ -1,7 +1,8 @@
 from django.forms import Form, CharField, fields as dj_fields, models
+from django.core.exceptions import ValidationError
 
 from lists.models import Item, List
-from lists.constants import EMPTY_LIST_ERROR_MSG
+from lists.constants import EMPTY_LIST_ERROR_MSG, DUPLICATE_ITEM_ERROR_MSG
 
 
 class ItemForm(models.ModelForm):
@@ -23,3 +24,19 @@ class ItemForm(models.ModelForm):
             for_list = List.objects.create()
         self.instance.list = for_list
         return super().save()
+
+
+class ExistingListItemForm(ItemForm):
+    def __init__(self, for_list: List, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.instance.list = for_list
+
+    def validate_unique(self):
+        try:
+            self.instance.validate_unique()
+        except ValidationError as e:
+            e.error_dict = {'text': [DUPLICATE_ITEM_ERROR_MSG]}
+            self._update_errors(e)
+
+    def save(self):
+        return models.ModelForm.save(self)

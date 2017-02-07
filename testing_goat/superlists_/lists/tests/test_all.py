@@ -7,8 +7,8 @@ from django.http import HttpRequest, HttpResponse
 from django.utils.html import escape
 from lists.views import home_page, view_list
 from lists.models import Item, List
-from lists.forms import ItemForm
-from lists.constants import EMPTY_LIST_ERROR_MSG
+from lists.forms import ItemForm, ExistingListItemForm
+from lists.constants import EMPTY_LIST_ERROR_MSG, DUPLICATE_ITEM_ERROR_MSG
 
 
 class NewListTests(TestCase):
@@ -74,8 +74,17 @@ class ListViewTests(TestCase):
         correct_list = List.objects.create()
         response: HttpResponse = self.client.get(f'/lists/{correct_list.id}/', data={'text': "AaA"})
 
-        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
         self.assertContains(response, 'name="text"')
+
+    def test_duplicate_item_validation_shows_up_on_page(self):
+        lst = List.objects.create()
+        item1 = Item.objects.create(text='Text', list=lst)
+        response: HttpResponse = self.client.post(f'/lists/{lst.id}/', data={'text': "Text"})
+
+        self.assertContains(response, escape(DUPLICATE_ITEM_ERROR_MSG))
+        self.assertTemplateUsed(response, 'list.html')
+        self.assertEqual(Item.objects.count(), 1)
 
     def test_passes_correct_list_to_template(self):
         other_list = List.objects.create()
@@ -143,7 +152,7 @@ class ListViewTests(TestCase):
     def test_invalid_input_uses_item_template(self):
         rsp: HttpResponse = self.post_invalid_input()
 
-        self.assertIsInstance(rsp.context['form'], ItemForm)
+        self.assertIsInstance(rsp.context['form'], ExistingListItemForm)
 
 
 class HomePageTests(TestCase):

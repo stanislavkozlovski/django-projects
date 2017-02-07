@@ -1,6 +1,8 @@
-from functional_tests.base import FunctionalTest
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+
+from functional_tests.base import FunctionalTest
+from lists.constants import DUPLICATE_ITEM_ERROR_MSG, EMPTY_LIST_ERROR_MSG
 
 
 class ItemValidationTests(FunctionalTest):
@@ -17,7 +19,7 @@ class ItemValidationTests(FunctionalTest):
 
         # The home page refreshes and there is an error message saying that you cannot add a blank item
         error = self.browser.find_element_by_class_name('has-error')
-        self.assertEqual(error.text, "You can't have an empty list item!")
+        self.assertEqual(error.text, EMPTY_LIST_ERROR_MSG)
 
         # He types his real todo item this time and hits enter, which now works
         input_box = self.get_item_input_box()
@@ -35,7 +37,7 @@ class ItemValidationTests(FunctionalTest):
         self.assertRowInListTable('1: Stop being so clumsy!')
         # He receives a similar warning on the list page
         error = self.browser.find_element_by_class_name('has-error')
-        self.assertEqual(error.text, "You can't have an empty list item!")
+        self.assertEqual(error.text, EMPTY_LIST_ERROR_MSG)
 
         # And he can correct it by filling some text in
         self.get_item_input_box().send_keys('Stop it!\n')
@@ -52,7 +54,7 @@ class ItemValidationTests(FunctionalTest):
         self.get_item_input_box().send_keys(f'{goat_todo}\n')
         # Luckily, he gets an error message saying that he should not have duplicate items
         error = self.browser.find_element_by_class_name('has-error')
-        self.assertEqual(error.text, "You can't have a duplicate list item!")
+        self.assertEqual(error.text, DUPLICATE_ITEM_ERROR_MSG)
 
         self.assertRowInListTable(f'1: {goat_todo}')
         self.assertRowNotInListTable(f'2: {goat_todo}')
