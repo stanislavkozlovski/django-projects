@@ -19,7 +19,7 @@ def view_list(request: HttpRequest, list_id: str):
         form = ItemForm(data=request.POST)
         list_ = List.objects.get(id=list_id)  # TODO: Validation
         if form.is_valid():
-            item = Item.objects.create(text=request.POST['text'], list=list_)
+            form.save(for_list=list_)
 
             return redirect(list_)  # :O
         else:
@@ -34,8 +34,8 @@ def new_list(request: HttpRequest):
     """ Creates a new TODO list with the new item """
     form = ItemForm(data=request.POST)
     if form.is_valid():
-        list_ = List.objects.create()
-        Item.objects.create(text=request.POST['text'], list=list_)
+        item = form.save()
+        list_ = item.list
         return redirect(list_)
     else:
         return render(request, 'home.html', {'form': form})
