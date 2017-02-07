@@ -11,6 +11,10 @@ class ItemValidationTests(FunctionalTest):
         input_box = self.get_item_input_box()
         input_box.send_keys(Keys.ENTER)
 
+        # The HTML does not even let him enter it in, but the Clumsy Goat is a little hacker and...
+        self.browser.execute_script("document.getElementById('id_text').required = false;")
+        input_box.send_keys(Keys.ENTER)
+
         # The home page refreshes and there is an error message saying that you cannot add a blank item
         error = self.browser.find_element_by_class_name('has-error')
         self.assertEqual(error.text, "You can't have an empty list item!")
@@ -23,6 +27,9 @@ class ItemValidationTests(FunctionalTest):
 
         # Because he is a clumsy goat (and apparently not too strict on his TODOs), he accidentally selects the inputbox and hits enter again
         input_box = self.get_item_input_box()
+        input_box.send_keys(Keys.ENTER)
+        # the HTML is no match for him again
+        self.browser.execute_script("document.getElementById('id_text').required = false;")
         input_box.send_keys(Keys.ENTER)
 
         self.assertRowInListTable('1: Stop being so clumsy!')

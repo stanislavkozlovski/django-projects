@@ -43,7 +43,7 @@ class ListCreationTests(FunctionalTest):
         self.browser.get(self.server_url)
 
         # the other goat adds a todo item, he is apparently more practical
-        input_box = self.browser.get_item_input_box()
+        input_box = self.get_item_input_box()
         input_box.send_keys('Test things')
         input_box.send_keys(Keys.ENTER)
         # Gets redirected to his own URL
