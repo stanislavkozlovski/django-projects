@@ -22,3 +22,18 @@ class LayoutAndStylingTests(FunctionalTest):
             512,
             delta=6
         )
+
+    def test_error_messages_are_cleared_on_input(self):
+        # The Artistic Goat visits our page
+        self.browser.get(self.server_url)
+        self.js_remove_input_box_required_attr()
+        self.get_item_input_box().send_keys('\n')
+        # it gets an error message
+        error = self.get_error_element()
+        self.assertTrue(error.is_displayed())
+        # it starts typing and the error message disappears
+        self.get_item_input_box().send_keys('a')
+        # it is pleased that the error message is no more
+        error = self.get_error_element()
+        self.assertFalse(error.is_displayed())
+

@@ -14,11 +14,11 @@ class ItemValidationTests(FunctionalTest):
         input_box.send_keys(Keys.ENTER)
 
         # The HTML does not even let him enter it in, but the Clumsy Goat is a little hacker and...
-        self.browser.execute_script("document.getElementById('id_text').required = false;")
+        self.js_remove_input_box_required_attr()
         input_box.send_keys(Keys.ENTER)
 
         # The home page refreshes and there is an error message saying that you cannot add a blank item
-        error = self.browser.find_element_by_class_name('has-error')
+        error = self.get_error_element()
         self.assertEqual(error.text, EMPTY_LIST_ERROR_MSG)
 
         # He types his real todo item this time and hits enter, which now works
@@ -31,12 +31,12 @@ class ItemValidationTests(FunctionalTest):
         input_box = self.get_item_input_box()
         input_box.send_keys(Keys.ENTER)
         # the HTML is no match for him again
-        self.browser.execute_script("document.getElementById('id_text').required = false;")
+        self.js_remove_input_box_required_attr()
         input_box.send_keys(Keys.ENTER)
 
         self.assertRowInListTable('1: Stop being so clumsy!')
         # He receives a similar warning on the list page
-        error = self.browser.find_element_by_class_name('has-error')
+        error = self.get_error_element()
         self.assertEqual(error.text, EMPTY_LIST_ERROR_MSG)
 
         # And he can correct it by filling some text in
@@ -53,7 +53,7 @@ class ItemValidationTests(FunctionalTest):
         # Some time passes and is adds the same todo, since his memory is pretty Bad
         self.get_item_input_box().send_keys(f'{goat_todo}\n')
         # Luckily, he gets an error message saying that he should not have duplicate items
-        error = self.browser.find_element_by_class_name('has-error')
+        error = self.get_error_element()
         self.assertEqual(error.text, DUPLICATE_ITEM_ERROR_MSG)
 
         self.assertRowInListTable(f'1: {goat_todo}')
