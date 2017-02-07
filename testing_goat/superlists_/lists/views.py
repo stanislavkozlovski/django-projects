@@ -16,7 +16,7 @@ def view_list(request: HttpRequest, list_id: str):
     error_msg = None
     if request.method == 'POST':
         """ Creates and adds a new item to an existing TODO list """
-        new_item_text = request.POST['item_text']
+        new_item_text = request.POST['text']
         list_ = List.objects.get(id=list_id)
         item = Item.objects.create(text=new_item_text, list=list_)
 
@@ -30,13 +30,13 @@ def view_list(request: HttpRequest, list_id: str):
             error_msg = EMPTY_LIST_ERROR_MSG
 
     list_: List = List.objects.get(id=list_id)
-    return render(request, 'list.html', {'list': list_, 'error': error_msg})
+    return render(request, 'list.html', {'list': list_, 'error': error_msg, 'form': ItemForm()})
 
 
 # @lists/new
 def new_list(request: HttpRequest):
     """ Creates a new TODO list with the new item """
-    new_item_text = request.POST['item_text']
+    new_item_text = request.POST['text']
     new_list_ = List.objects.create()
     item = Item.objects.create(text=new_item_text, list=new_list_)
 
@@ -45,7 +45,7 @@ def new_list(request: HttpRequest):
         item.save()
     except ValidationError as e:
         new_list_.delete()
-        return render(request, 'home.html', {'error': EMPTY_LIST_ERROR_MSG})
+        return render(request, 'home.html', {'error': EMPTY_LIST_ERROR_MSG, 'form': ItemForm()})
 
     return redirect(new_list_)
 

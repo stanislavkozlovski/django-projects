@@ -12,7 +12,7 @@ class ListCreationTests(FunctionalTest):
         header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertEqual(header_text, 'Start a new To-Do list')
         # It is invited to enter a goat TODO
-        input_box = self.browser.find_element_by_id('new_item')
+        input_box = self.get_item_input_box()
         self.assertEqual(
             input_box.get_attribute('placeholder'),
             'Add a to-do'
@@ -27,7 +27,7 @@ class ListCreationTests(FunctionalTest):
         self.assertRegex(goat_list_url, r'/lists/.*')
         self.assertRowInListTable('1: Test Coffee')
         # It types "Buy Coffee" and presses enter again
-        input_box = self.browser.find_element_by_id('new_item')
+        input_box = self.get_item_input_box()
         input_box.send_keys('Buy Coffee')
         input_box.send_keys(Keys.ENTER)
 
@@ -43,7 +43,7 @@ class ListCreationTests(FunctionalTest):
         self.browser.get(self.server_url)
 
         # the other goat adds a todo item, he is apparently more practical
-        input_box = self.browser.find_element_by_id('new_item')
+        input_box = self.browser.get_item_input_box()
         input_box.send_keys('Test things')
         input_box.send_keys(Keys.ENTER)
         # Gets redirected to his own URL
