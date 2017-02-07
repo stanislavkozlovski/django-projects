@@ -42,3 +42,19 @@ class ItemValidationTests(FunctionalTest):
         self.assertRowInListTable('1: Stop being so clumsy!')
         self.assertRowInListTable('2: Stop it!')
 
+    def test_cannot_add_duplicate_items(self):
+        # The Goat With Bad Memory opens the site
+        goat_todo = 'Buy ginkgo biloba'
+        self.browser.get(self.live_server_url)
+        # It enters one of it's TODOs
+        self.get_item_input_box().send_keys(f'{goat_todo}\n')
+        # Some time passes and is adds the same todo, since his memory is pretty Bad
+        self.get_item_input_box().send_keys(f'{goat_todo}\n')
+        # Luckily, he gets an error message saying that he should not have duplicate items
+        error = self.browser.find_element_by_class_name('has-error')
+        self.assertEqual(error.text, "You can't have a duplicate list item!")
+
+        self.assertRowInListTable(f'1: {goat_todo}')
+        self.assertRowNotInListTable(f'2: {goat_todo}')
+
+

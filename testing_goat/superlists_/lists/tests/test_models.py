@@ -3,35 +3,23 @@ from django.core.exceptions import ValidationError
 from lists.models import Item, List
 
 
-class ItemModelAndListModelTests(TestCase):
-    def test_saving_and_retrieving_items(self):
+class ItemModelTests(TestCase):
+    def test_item_str(self):
+        item = Item(text='hello')
+        self.assertEqual(str(item), 'hello')
+
+    def test_default_value(self):
+        item = Item()
+        self.assertEqual(item.text, '')
+
+    def test_item_is_related_to_list(self):
         list_ = List()
         list_.save()
+        item = Item()
+        item.list = list_
+        item.save()
 
-        f_item_text = 'First item ever!'
-        first_item = Item()
-        first_item.text = f_item_text
-        first_item.list = list_
-        first_item.save()
-
-        s_item_text = 'Second!'
-        second_item = Item()
-        second_item.text = s_item_text
-        second_item.list = list_
-        second_item.save()
-
-        saved_list = List.objects.first()
-        self.assertEqual(saved_list, list_)
-
-        saved_items = Item.objects.all()
-        self.assertEqual(saved_items.count(), 2)
-
-        first_saved_item = saved_items[0]
-        second_saved_item = saved_items[1]
-        self.assertEqual(first_saved_item.text, f_item_text)
-        self.assertEqual(first_saved_item.list, list_)
-        self.assertEqual(second_saved_item.text, s_item_text)
-        self.assertEqual(second_saved_item.list, list_)
+        self.assertIn(item, list_.item_set.all())
 
     def test_cannot_save_blank_item(self):
         list_ = List.objects.create()
@@ -40,6 +28,23 @@ class ItemModelAndListModelTests(TestCase):
             item.save()
             item.full_clean()
 
+    def test_cannot_save_duplicate_item(self):
+        list_ = List.objects.create()
+        item = Item(list=list_, text='dup')
+        item.save()
+        with self.assertRaises(ValidationError):
+            item = Item(list=list_, text='dup')
+            item.full_clean()
+
+    def test_can_have_duplicate_items_in_different_lists(self):
+        list_ = List.objects.create()
+        list2_ = List.objects.create()
+        item = Item(list=list_, text='dup')
+        item_2 = Item(list=list2_, text='dup')
+        item.full_clean()  # should not raise an error
+
+
+class ListsModelTests(TestCase):
     def test_get_absolute_url(self):
         list_ = List.objects.create()
         expected_url = f'/lists/{list_.id}/'
