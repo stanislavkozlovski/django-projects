@@ -1,5 +1,9 @@
 import uuid
 from django.db import models
+from django.contrib import auth
+
+# Hacky way to avoid the lack of 'last_login" field in our user
+auth.signals.user_logged_in.disconnect(auth.models.update_last_login)
 
 
 # Create your models here.
