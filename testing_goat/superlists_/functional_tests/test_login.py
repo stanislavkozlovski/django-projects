@@ -21,7 +21,7 @@ class LoginTest(FunctionalTest):
 
         # A message appears telling it the email has been sent
         self.wait_for(lambda: self.assertIn(
-            "Check your email, you'll find a message with a link that will log you into the site.",
+            'Your unique login URL has been sent! Please check your e-mail.',
             self.browser.find_element_by_tag_name('body').text
         ))
 
@@ -31,7 +31,7 @@ class LoginTest(FunctionalTest):
         self.assertEqual(email.subject, SUBJECT)
 
         # It has an url link to it
-        self.assertIn('Use this link to log in', email.body)
+        self.assertIn('This is your login link for Superlists', email.body)
         url_search = re.search(r'http://.+/.+$', email.body)
         if not url_search:
             self.fail("Could not find the login URL in the sent e-mail.")
