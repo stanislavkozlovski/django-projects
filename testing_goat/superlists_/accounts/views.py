@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, reverse
 from django.core.mail import send_mail as send_email
 from django.http import HttpRequest, HttpResponse
 from django.contrib import messages
+from django.contrib import auth
 
 from accounts.models import Token
 
@@ -24,4 +25,9 @@ def send_email_post(request: HttpRequest):
 
 def login(request: HttpRequest):
     login_token = request.GET.get('token', '')
+    user = auth.authenticate(uid=login_token)
+    if user is not None:
+        auth.login(request, user)
+
     return redirect('/')
+
