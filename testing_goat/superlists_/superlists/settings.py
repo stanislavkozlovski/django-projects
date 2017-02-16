@@ -52,7 +52,11 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'superlists.urls'
+
 AUTH_USER_MODEL = 'accounts.User'
+AUTHENTICATION_BACKENDS = [
+    'accounts.authentication.PasswordlessAuthenticationBackend',
+]
 
 TEMPLATES = [
     {

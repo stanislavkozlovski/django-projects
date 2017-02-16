@@ -45,3 +45,7 @@ class AuthenticationTests(TestCase):
 
         self.assertIsInstance(result, User)
         self.assertEqual(result, orig_user)
+
+    def test_returns_None_if_no_user_with_such_email(self):
+        none_user = PasswordlessAuthenticationBackend().get_user(email='SoBabyPullMeCloser')
+        self.assertIsNone(none_user)

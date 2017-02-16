@@ -9,11 +9,7 @@ class PasswordlessAuthenticationBackend:
             return None
         token = Token.objects.filter(uid=uid).first()
 
-        if not User.objects.filter(email=token.email).exists():
-            # Create a new user
-            return User.objects.create(email=token.email)
-
-        return User.objects.get(email=token.email)
+        return User.objects.get_or_create(email=token.email)[0]
 
     def get_user(self, email):
-        return User.objects.get(email=email)
+        return User.objects.filter(email=email).first()
