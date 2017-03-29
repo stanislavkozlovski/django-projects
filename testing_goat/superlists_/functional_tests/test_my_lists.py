@@ -1,12 +1,11 @@
 from django.conf import settings
 from .base import FunctionalTest
-from .management.commands.create_session import create_pre_authenticated_session
 
 
 class MyListsTest(FunctionalTest):
     def test_logged_in_users_lists_are_saved_as_my_lists(self):
         # the list goat is a logged in user
-        create_pre_authenticated_session("list_goat@abv.bg")
+        self.create_pre_authenticated_session("list_goat@abv.bg")
 
         # it goes to the home page and starts a list
         self.browser.get(self.live_server_url)

@@ -39,3 +39,9 @@ def new_list(request: HttpRequest):
         return redirect(list_)
     else:
         return render(request, 'home.html', {'form': form})
+
+
+# @lists/user/my_lists
+def my_lists(request: HttpRequest, user_email: str):
+    """ Shows the User all of his lists"""
+    return render(request, 'my_lists.html')

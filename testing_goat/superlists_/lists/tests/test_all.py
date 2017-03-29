@@ -154,6 +154,10 @@ class ListViewTests(TestCase):
 
         self.assertIsInstance(rsp.context['form'], ExistingListItemForm)
 
+    def test_my_lists_url_renders_my_lists_template(self):
+        rsp: HttoResponse = self.client.get('/lists/users/me@abv.bg/')
+        self.assertTemplateUsed(rsp, 'my_lists.html')
+
 
 class HomePageTests(TestCase):
     def test_home_page_renders_home_template(self):
