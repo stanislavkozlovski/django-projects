@@ -4,8 +4,7 @@ from django.core.exceptions import ValidationError
 from lists.models import Item, List
 from accounts.models import User
 from lists.constants import EMPTY_LIST_ERROR_MSG
-from lists.forms import ItemForm, ExistingListItemForm
-
+from lists.forms import ItemForm, ExistingListItemForm, NewListForm
 
 # /
 def home_page(request: HttpRequest):
@@ -31,19 +30,27 @@ def view_list(request: HttpRequest, list_id: str):
 
 
 # @lists/new
-def new_list(request: HttpRequest):
-    """ Creates a new TODO list with the new item """
-    form = ItemForm(data=request.POST)
-    if form.is_valid():
-        list_ = List()
-        if request.user.is_authenticated:
-            list_.owner = request.user
-        list_.save()
-        form.save(for_list=list_)
-        return redirect(list_)
-    else:
-        return render(request, 'home.html', {'form': form})
+# def new_list(request: HttpRequest):
+#     """ Creates a new TODO list with the new item """
+#     form = ItemForm(data=request.POST)
+#     if form.is_valid():
+#         list_ = List()
+#         if request.user.is_authenticated:
+#             list_.owner = request.user
+#         list_.save()
+#         form.save(for_list=list_)
+#         return redirect(list_)
+#     else:
+#         return render(request, 'home.html', {'form': form})
 
+
+def new_list(request: HttpRequest):
+    form = NewListForm(data=request.POST)
+    if form.is_valid():
+        list_ = form.save(owner=request.user)
+        return redirect(list_)
+
+    return render(request, 'home.html', {'form': form})
 
 # @lists/user/my_lists
 def my_lists(request: HttpRequest, user_email: str):

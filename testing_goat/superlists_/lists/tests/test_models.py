@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from lists.models import Item, List
+
 from accounts.models import User
 
 
@@ -62,6 +63,11 @@ class ListsModelTests(TestCase):
     def test_list_owner_is_optional(self):
         List.objects.create()  # should not raise an error
 
+    def test_create_returns_new_list_object(self):
+        returned = List.create_new(first_item_text='new item text')
+        new_list = List.objects.first()
+        self.assertEqual(returned, new_list)
+
     def test_list_name_is_first_item_text(self):
         list_ = List.objects.create()
         Item.objects.create(list=list_, text='first item')
@@ -71,3 +77,16 @@ class ListsModelTests(TestCase):
     def test_list_name_without_items_is_new_list(self):
         list_ = List.objects.create()
         self.assertEqual(list_.name, 'New List')
+
+    def test_create_new_creates_list_and_first_item(self):
+        List.create_new(first_item_text='new item text')
+        new_item = Item.objects.first()
+        self.assertEqual(new_item.text, 'new item text')
+        new_list = List.objects.first()
+        self.assertEqual(new_item.list, new_list)
+
+    def test_create_new_optionally_saves_owner(self):
+        user = User.objects.create()
+        List.create_new(first_item_text='new item text', owner=user)
+        new_list = List.objects.first()
+        self.assertEqual(new_list.owner, user)

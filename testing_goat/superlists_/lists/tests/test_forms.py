@@ -1,9 +1,30 @@
+import unittest
+from unittest.mock import patch, Mock
 from django.test import TestCase
 
+from lists.forms import ItemForm, ExistingListItemForm, NewListForm, DUPLICATE_ITEM_ERROR_MSG, EMPTY_LIST_ERROR_MSG
 from lists.models import Item, List
-from lists.forms import ItemForm, ExistingListItemForm
 from lists.constants import EMPTY_LIST_ERROR_MSG, DUPLICATE_ITEM_ERROR_MSG
 
+
+class NewListFormTests(unittest.TestCase):
+
+    @patch('lists.forms.List.create_new')
+    def test_save_creates_new_list_from_post_data_if_user_not_authenticated(self, mock_List_create_new):
+        user = Mock(is_authenticated=False)
+        form = NewListForm(data={'text': 'new item text'})
+        form.is_valid()
+        form.save(owner=user)
+
+        mock_List_create_new.assert_called_once_with(first_item_text='new item text')
+
+    @patch('lists.forms.List.create_new')
+    def test_save_returns_new_list_object(self, mock_List_create_new):
+        user = Mock(is_authenticated=True)
+        form = NewListForm(data={'text': 'new item text'})
+        form.is_valid()
+        response = form.save(owner=user)
+        self.assertEqual(response, mock_List_create_new.return_value)
 
 class ExistingListItemFormTests(TestCase):
     def test_form_save(self):
@@ -44,15 +65,15 @@ class ItemFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['text'], [EMPTY_LIST_ERROR_MSG])
 
-    def test_form_save_handles_saving_to_a_list(self):
-        list_ = List.objects.create()
-        form = ItemForm(data={'text': 'Samurai Jack'})
-        new_item: Item = form.save(for_list=list_)
-
-        self.assertEqual(new_item, Item.objects.first())
-        self.assertEqual(new_item.list, list_)
-        self.assertEqual(new_item.text, 'Samurai Jack')
-        self.assertEqual(Item.objects.count(), 1)
+    # def test_form_save_handles_saving_to_a_list(self):
+    #     list_ = List.objects.create()
+    #     form = ItemForm(data={'text': 'Samurai Jack'})
+    #     new_item: Item = form.save(for_list=list_)
+    #
+    #     self.assertEqual(new_item, Item.objects.first())
+    #     self.assertEqual(new_item.list, list_)
+    #     self.assertEqual(new_item.text, 'Samurai Jack')
+    #     self.assertEqual(Item.objects.count(), 1)
 
     def test_form_save_handles_creating_a_new_list(self):
         form = ItemForm(data={'text': 'Samurai Jack'})
