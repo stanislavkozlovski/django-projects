@@ -2,6 +2,7 @@ from django.shortcuts import redirect, render
 from django.http import HttpRequest, HttpResponse
 from django.core.exceptions import ValidationError
 from lists.models import Item, List
+from accounts.models import User
 from lists.constants import EMPTY_LIST_ERROR_MSG
 from lists.forms import ItemForm, ExistingListItemForm
 
@@ -34,8 +35,11 @@ def new_list(request: HttpRequest):
     """ Creates a new TODO list with the new item """
     form = ItemForm(data=request.POST)
     if form.is_valid():
-        item = form.save()
-        list_ = item.list
+        list_ = List()
+        if request.user.is_authenticated:
+            list_.owner = request.user
+        list_.save()
+        form.save(for_list=list_)
         return redirect(list_)
     else:
         return render(request, 'home.html', {'form': form})
@@ -44,4 +48,8 @@ def new_list(request: HttpRequest):
 # @lists/user/my_lists
 def my_lists(request: HttpRequest, user_email: str):
     """ Shows the User all of his lists"""
-    return render(request, 'my_lists.html')
+    try:
+        user = User.objects.get(email=user_email)
+    except User.DoesNotExist:
+        return redirect('/')
+    return render(request, 'my_lists.html', {'owner': user})

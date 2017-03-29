@@ -7,6 +7,7 @@ from django.http import HttpRequest, HttpResponse
 from django.utils.html import escape
 from lists.views import home_page, view_list
 from lists.models import Item, List
+from accounts.models import User
 from lists.forms import ItemForm, ExistingListItemForm
 from lists.constants import EMPTY_LIST_ERROR_MSG, DUPLICATE_ITEM_ERROR_MSG
 
@@ -18,6 +19,13 @@ class NewListTests(TestCase):
         self.assertEqual(Item.objects.count(), 1)
         first_obj = Item.objects.first()
         self.assertEqual(first_obj.text, 'Coffee')
+
+    def test_new_list_has_owner(self):
+        user = User.objects.create(email="fman@abv.bg")
+        self.client.force_login(user)
+        self.client.post('/lists/new', data={'text': 'Coffee'})
+        first_obj = List.objects.first()
+        self.assertEqual(first_obj.owner, user)
 
     def test_new_list_page_redirects_after_post(self):
         response = self.client.post('/lists/new', data={'text': 'Aa'})
@@ -155,8 +163,17 @@ class ListViewTests(TestCase):
         self.assertIsInstance(rsp.context['form'], ExistingListItemForm)
 
     def test_my_lists_url_renders_my_lists_template(self):
-        rsp: HttoResponse = self.client.get('/lists/users/me@abv.bg/')
+        user = User.objects.create(email='user@abv.bg')
+        rsp: HttoResponse = self.client.get(f'/lists/users/{user.email}/')
         self.assertTemplateUsed(rsp, 'my_lists.html')
+
+    def test_passes_correct_owner_to_template(self):
+        wrong_owner = User.objects.create(email='wrong_owner@abv.bg')
+        wrong_owner.save()
+        correct_user = User.objects.create(email='user@abv.bg')
+        correct_user.save()
+        response = self.client.get('/lists/users/user@abv.bg/')
+        self.assertEqual(response.context['owner'], correct_user)
 
 
 class HomePageTests(TestCase):

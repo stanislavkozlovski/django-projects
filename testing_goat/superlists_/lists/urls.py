@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from django.contrib import admin
-from lists.views import view_list, new_list
+from lists.views import view_list, new_list, my_lists
 
 urlpatterns = [
     url(r'^(\d+)/$', view_list, name='view_list'),  # Specific list view
