@@ -22,9 +22,7 @@ class ItemValidationTests(FunctionalTest):
         self.assertEqual(error.text, EMPTY_LIST_ERROR_MSG)
 
         # He types his real todo item this time and hits enter, which now works
-        input_box = self.get_item_input_box()
-        input_box.send_keys('Stop being so clumsy!')
-        input_box.send_keys(Keys.ENTER)
+        self.add_list_item('Stop being so clumsy!')
         self.assertRowInListTable('1: Stop being so clumsy!')
 
         # Because he is a clumsy goat (and apparently not too strict on his TODOs), he accidentally selects the inputbox and hits enter again
@@ -49,9 +47,9 @@ class ItemValidationTests(FunctionalTest):
         goat_todo = 'Buy ginkgo biloba'
         self.browser.get(self.live_server_url)
         # It enters one of it's TODOs
-        self.get_item_input_box().send_keys(f'{goat_todo}\n')
+        self.add_list_item(goat_todo)
         # Some time passes and is adds the same todo, since his memory is pretty Bad
-        self.get_item_input_box().send_keys(f'{goat_todo}\n')
+        self.add_list_item(goat_todo, _assert=False)
         # Luckily, he gets an error message saying that he should not have duplicate items
         error = self.get_error_element()
         self.assertEqual(error.text, DUPLICATE_ITEM_ERROR_MSG)

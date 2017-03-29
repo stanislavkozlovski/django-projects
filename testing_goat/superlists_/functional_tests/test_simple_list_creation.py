@@ -18,18 +18,14 @@ class ListCreationTests(FunctionalTest):
             'Add a to-do'
         )
         # It types "Test Coffee"
-        input_box.send_keys('Test Coffee')
+        self.add_list_item('Test Coffee')
 
-        # When it presses enter, the page reloads and a textbox prompts for another TODO
-        input_box.send_keys(Keys.ENTER)
-        # Gets redirected to a unique URL holding it's list
+        # Gets redirected to a unique URL holding its list
         goat_list_url = self.browser.current_url
         self.assertRegex(goat_list_url, r'/lists/.*')
         self.assertRowInListTable('1: Test Coffee')
         # It types "Buy Coffee" and presses enter again
-        input_box = self.get_item_input_box()
-        input_box.send_keys('Buy Coffee')
-        input_box.send_keys(Keys.ENTER)
+        self.add_list_item('Buy Coffee')
 
         # His two TODOs are now saved and have a unique URL for the Testing Goat, which is described in the page
         self.assertRowInListTable('2: Buy Coffee')
@@ -43,9 +39,8 @@ class ListCreationTests(FunctionalTest):
         self.browser.get(self.server_url)
 
         # the other goat adds a todo item, he is apparently more practical
-        input_box = self.get_item_input_box()
-        input_box.send_keys('Test things')
-        input_box.send_keys(Keys.ENTER)
+        self.add_list_item('Test things')
+
         # Gets redirected to his own URL
         other_goat_list_url = self.browser.current_url
         self.assertRegex(goat_list_url, r'/lists/.*')
