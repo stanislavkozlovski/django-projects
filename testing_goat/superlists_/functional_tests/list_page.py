@@ -42,3 +42,6 @@ class ListPage:
 
     def js_remove_input_box_required_attr(self):
         self.test.browser.execute_script("document.getElementById('id_text').required = false;")
+
+    def get_list_owner(self):
+        return self.test.browser.find_element_by_id('id_list_owner').text
