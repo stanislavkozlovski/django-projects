@@ -90,3 +90,42 @@ class ListsModelTests(TestCase):
         List.create_new(first_item_text='new item text', owner=user)
         new_list = List.objects.first()
         self.assertEqual(new_list.owner, user)
+
+    def test_try_get_object_pk_returns_list(self):
+        ls = List.create_new(first_item_text='whatup')
+        ls.save()
+        self.assertEqual(ls, List.try_get_object_pk(pk=str(ls.id)))
+
+    def test_try_get_object_pk_invalid_pk_returns_none(self):
+        ls = List.create_new(first_item_text='whatup')
+        ls.save()
+        self.assertIsNone(List.try_get_object_pk(pk='4131'))
+
+    def test_try_get_object_pk_invalid_pk_type_returns_none(self):
+        ls = List.create_new(first_item_text='whatup')
+        ls.save()
+        self.assertIsNone(List.try_get_object_pk(pk='WAA'))
+
+    def test_share_list_shares_list(self):
+        ls = List.create_new(first_item_text='whatup')
+        ls.save()
+        user = User(email='me@abv.bg')
+        user.save()
+        res = ls.share_with(user.email)
+        user.save()
+        self.assertTrue(res)
+        self.assertIn(user, ls.shared_with.all())
+        self.assertIn(ls, user.shared_lists.all())
+
+    def test_share_list_invalid_email_doesnt_throw(self):
+        ls = List.create_new(first_item_text='whatup')
+        ls.save()
+        user = User(email='me@abv.bg')
+        user.save()
+        res = ls.share_with('nobody')
+        user.save()
+
+        self.assertFalse(res)
+        self.assertNotIn(user, list(ls.shared_with.all()))
+        self.assertEqual(len(ls.shared_with.all()), 0)
+        self.assertNotIn(ls, list(user.shared_lists.all()))

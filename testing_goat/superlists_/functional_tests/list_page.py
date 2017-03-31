@@ -30,10 +30,10 @@ class ListPage:
         return self
 
     def get_share_box(self):
-        return self.test.browser.find_element_by_css_selector('input[name="sharee"]')
+        return self.test.browser.find_element_by_css_selector('input[name="shared_with"]')
 
     def get_shared_with_list(self):
-        return self.test.browser.find_element_by_css_selector('.list-sharee')
+        return self.test.browser.find_element_by_css_selector('shared-with-list')
 
     def share_list_with(self, email):
         self.get_share_box().send_keys(email)

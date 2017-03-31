@@ -10,8 +10,10 @@ from django.db import models
 # Create your models here.
 class User(models.Model):
     email = models.EmailField(primary_key=True)
+    shared_lists = models.ManyToManyField('lists.List', related_name='shared_with', db_table='accounts_listuser_shared_lists')
     REQUIRED_FIELDS = ()
     USERNAME_FIELD = 'email'
+    db_table = 'accounts_user'
     is_anonymous = False
     is_authenticated = True
 

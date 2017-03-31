@@ -23,6 +23,31 @@ class List(models.Model):
         Item.objects.create(text=first_item_text, list=list_)
         return list_
 
+    @staticmethod
+    def try_get_object_pk(pk: str):
+        try:
+            pk = int(pk)
+        except ValueError:
+            return None
+
+        resulting_list = None
+        try:
+            resulting_list = List.objects.get(pk=pk)
+        except List.DoesNotExist as e:
+            pass
+
+        return resulting_list
+
+    def share_with(self, email):
+        """ Shares the list with a given person"""
+        try:
+            user = User.objects.get(pk=email)
+        except User.DoesNotExist as e:
+            return False
+
+        user.shared_lists.add(self)
+        return True
+
 
 class Item(models.Model):
     text = models.TextField(default='')

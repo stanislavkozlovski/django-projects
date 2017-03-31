@@ -14,7 +14,6 @@ def send_email_post(request: HttpRequest):
     user_email = request.POST.get('email', '')
     user_token = Token.objects.create(email=user_email)
     unique_url = request.build_absolute_uri(reverse('login') + f'?token={user_token.uid}')
-
     send_email(recipient_list=[user_email],
                from_email='me',
                subject='Your login link for Superlists',

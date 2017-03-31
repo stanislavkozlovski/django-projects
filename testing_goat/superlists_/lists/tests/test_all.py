@@ -7,11 +7,45 @@ from django.template.loader import render_to_string
 from django.test import TestCase
 from django.http import HttpRequest, HttpResponse
 from django.utils.html import escape
-from lists.views import home_page, view_list, new_list2
+from lists.views import home_page, view_list, new_list, share_list
 from lists.models import Item, List
 from accounts.models import User
 from lists.forms import ItemForm, ExistingListItemForm
 from lists.constants import EMPTY_LIST_ERROR_MSG, DUPLICATE_ITEM_ERROR_MSG
+
+
+class ShareWithViewTests(unittest.TestCase):
+    def setUp(self):
+        self.orig_user = User(email='orig@abv.bg')
+        self.user_list = List(owner=self.orig_user)
+        self.user_list.save()
+        self.second_user = User(email='me@abv.bg')
+        self.request = HttpRequest()
+        self.request.POST['shared_with'] = 'me@abv.bg'
+        self.request.user = Mock()
+
+    @patch('lists.models.List.share_with')
+    @patch('lists.models.List.try_get_object_pk')
+    def test_calls_appropriate_methods(self, try_get_mock, share_with_mock):
+        try_get_mock.return_value = self.user_list
+
+        share_list(self.request, list_id=str(self.user_list.id))
+        try_get_mock.assert_called_once_with(pk=str(self.user_list.id))
+        share_with_mock.assert_called_once_with('me@abv.bg')
+
+    def test_returns_response(self):
+        response = share_list(self.request, str(self.user_list.id))
+
+        self.assertIsInstance(response, HttpResponse)
+        # assert redirects
+        self.assertEqual(response.status_code, 302)
+
+    def test_redirects_with_wrong_id(self):
+        response = share_list(self.request, 'wawa')
+
+        self.assertIsInstance(response, HttpResponse)
+        # assert redirects
+        self.assertEqual(response.status_code, 302)
 
 
 @patch('lists.views.NewListForm')

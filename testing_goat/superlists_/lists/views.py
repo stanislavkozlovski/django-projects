@@ -60,3 +60,14 @@ def my_lists(request: HttpRequest, user_email: str):
     except User.DoesNotExist:
         return redirect('/')
     return render(request, 'my_lists.html', {'owner': user})
+
+
+def share_list(request: HttpRequest, list_id: str):
+    shared_with_email = request.POST.get('shared_with', '')
+
+    list_ = List.try_get_object_pk(pk=list_id)
+    if list_ is None:
+        return redirect('/')
+
+    list_.share_with(shared_with_email)
+    return redirect(list_.get_absolute_url())

@@ -10,5 +10,15 @@
         <a href="{{ item.get_absolute_url }}">{{ forloop.counter }}: {{ item.name }}</a>
       {% endfor %}
   </ul>
+  <!-- Show the shared lists -->
+  {% for list in owner.shared_lists.all %}
+    <h2 id="id_list_owner">{{list.owner.email}}</h2>
+      <ul>
+          {% for item in list %}
+            <a href="{{ item.get_absolute_url }}">{{ forloop.counter }}: {{ item.name }}</a>
+          {% endfor %}
+      </ul>
+  {% endfor %}
+
 
 {% endblock %}
