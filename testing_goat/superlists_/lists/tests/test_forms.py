@@ -65,16 +65,6 @@ class ItemFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['text'], [EMPTY_LIST_ERROR_MSG])
 
-    # def test_form_save_handles_saving_to_a_list(self):
-    #     list_ = List.objects.create()
-    #     form = ItemForm(data={'text': 'Samurai Jack'})
-    #     new_item: Item = form.save(for_list=list_)
-    #
-    #     self.assertEqual(new_item, Item.objects.first())
-    #     self.assertEqual(new_item.list, list_)
-    #     self.assertEqual(new_item.text, 'Samurai Jack')
-    #     self.assertEqual(Item.objects.count(), 1)
-
     def test_form_save_handles_creating_a_new_list(self):
         form = ItemForm(data={'text': 'Samurai Jack'})
         new_item: Item = form.save()
